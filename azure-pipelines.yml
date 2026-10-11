@@ -1,0 +1,39 @@
+pool: DevOps-pipeline
+
+trigger:
+  branches:    ###Branch filter
+    include:
+    - main
+    - feature/*
+  paths:       ###Path filter
+    include:
+      - env/dev/*
+
+variables:
+  terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+  azureBackendServiceArm: 'Azure-ADO-Pipeline'
+  azureBackendAzureRmResourceGroupName: 'rg-devops'
+  azureBackendAzureRmStorageAccountName: 'datablockstorage'
+  azureBackendAzureRmContainerName: 'aksstoragecont'
+  azureBackendAzureRmKey: 'env.aksstoragecont'
+
+stages:
+- stage: terraformInitAndValidate
+  displayName: Terraform Init and Validate
+  jobs:
+  - job: terraformInitAndValidate
+    displayName: Terraform Init And Validate
+    steps:
+
+    - template: templates/terraform-install.yml
+      parameters:
+        terraformVersion: 'latest'
+
+    - template: templates/terraform-init.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
+
+    
+    - template: templates/terraform-validate.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
