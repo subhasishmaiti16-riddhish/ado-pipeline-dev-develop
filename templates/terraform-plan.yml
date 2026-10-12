@@ -4,8 +4,15 @@ parameters:
 
 steps:
   - task: TerraformTask@5
-    displayName: Terraform plan
+    displayName: Terraform Plan
     inputs:
       provider: 'azurerm'
       command: 'plan'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
+      commandOptions: '-out=tfplan'
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish tfplan
+    inputs:
+      targetPath: '${{ parameters.terraformWorkingDir }}/tfplan'
+      artifact: 'tfplan'
