@@ -1,0 +1,11 @@
+parameters:
+  - name: terraformWorkingDir
+    type: string
+
+steps:
+  - task: TerraformTask@5
+    displayName: Terraform plan
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      workingDirectory: '${{ parameters.terraformWorkingDir }}'

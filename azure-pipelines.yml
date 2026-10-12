@@ -1,0 +1,52 @@
+pool: DevOps-pipeline
+
+trigger:
+  branches:    ###Branch filter
+    include:
+    - main
+    - feature/*
+  paths:       ###Path filter
+    include:
+      - env/dev/*
+
+variables:
+  - group: ado-pipeline-auto
+
+stages:
+- stage: terraformInitValidateAndPlan
+  displayName: Terraform Init Validate And Plan
+  jobs:
+  - job: terraformInitAndValidate
+    displayName: Terraform Init Validate And Plan
+    steps:
+
+    - template: templates/terraform-install.yml
+      parameters:
+        terraformVersion: 'latest'
+
+    - template: templates/terraform-init.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
+
+    
+    - template: templates/terraform-validate.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
+
+    - template: templates/terraform-plan.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
+
+- stage: terraformApply
+  dependsOn: terraformInitValidateAndPlan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - job: TerraformApply
+    steps:
+    - template: templates/terraform-init.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
+
+    - template: templates/terraform-apply.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
