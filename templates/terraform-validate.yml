@@ -1,0 +1,12 @@
+parameters:
+  - name: terraformWorkingDir
+    type: string
+
+steps:
+  - task: TerraformTask@5
+    displayName: Terraform Validate
+    inputs:
+      provider: 'azurerm'
+      command: 'validate'
+      workingDirectory: '${{ parameters.terraformWorkingDir }}'
+
