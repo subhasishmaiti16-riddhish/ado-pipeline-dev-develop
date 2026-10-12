@@ -1,4 +1,3 @@
-```hcl
 module "rg_dev" {
   source = "git::https://subhasishmaiti16@dev.azure.com/subhasishmaiti16/Resource-Template/_git/rgs"
 
