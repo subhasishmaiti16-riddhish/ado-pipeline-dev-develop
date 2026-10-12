@@ -10,7 +10,12 @@ trigger:
       - env/dev/*
 
 variables:
-  - group: ado-pipeline-auto
+  terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+  azureServiceConnection: 'Azure-ADO-Pipeline'
+  backendResourceGroup: 'rg-devops'
+  backendStorageAccount: 'datablockstorage'
+  backendContainer: 'aksstoragecont'
+  backendKey: 'env.aksstoragecont'
 
 stages:
 - stage: terraformInitValidateAndPlan
@@ -31,16 +36,16 @@ stages:
 
     - template: templates/terraform-init.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
     
     - template: templates/terraform-validate.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
     - template: templates/terraform-plan.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
 - stage: terraformApply
   dependsOn: terraformInitValidateAndPlan
@@ -50,8 +55,8 @@ stages:
     steps:
     - template: templates/terraform-init.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
     - template: templates/terraform-apply.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
