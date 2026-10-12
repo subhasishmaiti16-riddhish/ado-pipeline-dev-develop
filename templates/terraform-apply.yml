@@ -1,11 +1,15 @@
 parameters:
   - name: terraformWorkingDir
     type: string
+  - name: serviceConnection
+    type: string
 
 steps:
   - task: TerraformTask@5
-    displayName: Terraform apply
+    displayName: Terraform Apply
     inputs:
       provider: 'azurerm'
       command: 'apply'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
+      commandOptions: 'tfplan'
+      environmentServiceNameAzureRM: '${{ parameters.serviceConnection }}'
