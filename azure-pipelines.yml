@@ -33,6 +33,9 @@ stages:
         terraform version
       displayName: Verify Terraform Installation
 
+    - checkout: self
+      persistCredentials: true
+
     - script: |
         git config --global url."https://oauth2:$(System.AccessToken)@dev.azure.com/".insteadOf "https://dev.azure.com/"
       displayName: Configure git auth for Terraform modules
