@@ -1,7 +1,16 @@
 parameters:
   - name: terraformWorkingDir
     type: string
-    default: '$(System.DefaultWorkingDirectory)/env/dev'
+  - name: serviceConnection
+    type: string
+  - name: backendResourceGroup
+    type: string
+  - name: backendStorageAccount
+    type: string
+  - name: backendContainer
+    type: string
+  - name: backendKey
+    type: string
 
 steps:
   - task: TerraformTask@5
@@ -10,8 +19,8 @@ steps:
       provider: 'azurerm'
       command: 'init'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
-      backendServiceArm: '$(azureServiceConnection)'
-      backendAzureRmResourceGroupName: '$(backendResourceGroup)'
-      backendAzureRmStorageAccountName: '$(backendStorageAccount)'
-      backendAzureRmContainerName: '$(backendContainer)'
-      backendAzureRmKey: '$(backendKey)'
+      backendServiceArm: '${{ parameters.serviceConnection }}'
+      backendAzureRmResourceGroupName: '${{ parameters.backendResourceGroup }}'
+      backendAzureRmStorageAccountName: '${{ parameters.backendStorageAccount }}'
+      backendAzureRmContainerName: '${{ parameters.backendContainer }}'
+      backendAzureRmKey: '${{ parameters.backendKey }}'
