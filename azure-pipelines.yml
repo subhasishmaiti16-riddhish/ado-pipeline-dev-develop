@@ -10,12 +10,7 @@ trigger:
       - env/dev/*
 
 variables:
-  terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
-  azureBackendServiceArm: 'Azure-ADO-Pipeline'
-  azureBackendAzureRmResourceGroupName: 'rg-devops'
-  azureBackendAzureRmStorageAccountName: 'datablockstorage'
-  azureBackendAzureRmContainerName: 'aksstoragecont'
-  azureBackendAzureRmKey: 'env.aksstoragecont'
+  - group: ado-pipeline-auto
 
 stages:
 - stage: terraformInitAndValidate
