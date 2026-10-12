@@ -26,16 +26,16 @@ stages:
 
     - template: templates/terraform-init.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
     
     - template: templates/terraform-validate.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
     - template: templates/terraform-plan.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
 - stage: terraformApply
   dependsOn: terraformInitValidateAndPlan
@@ -45,8 +45,8 @@ stages:
     steps:
     - template: templates/terraform-init.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
 
     - template: templates/terraform-apply.yml
       parameters:
-        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
+        terraformWorkingDir: '$(terraformWorkingDir)'
