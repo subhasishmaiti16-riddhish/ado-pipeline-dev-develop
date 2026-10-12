@@ -1,8 +1,6 @@
 parameters:
   - name: terraformWorkingDir
     type: string
-  - name: serviceConnection
-    type: string
 
 steps:
   - task: TerraformTask@5
