@@ -22,7 +22,12 @@ stages:
 
     - template: templates/terraform-install.yml
       parameters:
-        terraformVersion: 'latest'
+        terraformVersion: '1.9.8'
+
+    - script: |
+        where terraform
+        terraform version
+      displayName: Verify Terraform Installation
 
     - template: templates/terraform-init.yml
       parameters:
@@ -31,11 +36,11 @@ stages:
     
     - template: templates/terraform-validate.yml
       parameters:
-        terraformWorkingDir: '$(terraformWorkingDir)'
+        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
 
     - template: templates/terraform-plan.yml
       parameters:
-        terraformWorkingDir: '$(terraformWorkingDir)'
+        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
 
 - stage: terraformApply
   dependsOn: terraformInitValidateAndPlan
@@ -45,8 +50,8 @@ stages:
     steps:
     - template: templates/terraform-init.yml
       parameters:
-        terraformWorkingDir: '$(terraformWorkingDir)'
+        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
 
     - template: templates/terraform-apply.yml
       parameters:
-        terraformWorkingDir: '$(terraformWorkingDir)'
+        terraformWorkingDir: '$(System.DefaultWorkingDirectory)/env/dev'
