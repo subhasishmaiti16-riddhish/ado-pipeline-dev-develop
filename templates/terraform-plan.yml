@@ -9,6 +9,7 @@ steps:
       provider: 'azurerm'
       command: 'plan'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
+      environmentServiceNameAzureRM: '${{ parameters.serviceConnection }}'
       commandOptions: '-out=tfplan'
 
   - task: PublishPipelineArtifact@1
