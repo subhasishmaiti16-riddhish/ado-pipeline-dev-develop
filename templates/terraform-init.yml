@@ -1,7 +1,6 @@
 parameters:
   - name: terraformWorkingDir
     type: string
-    default: '$(System.DefaultWorkingDirectory)/env/dev'
 
 steps:
   - task: TerraformTask@5
@@ -10,7 +9,7 @@ steps:
       provider: 'azurerm'
       command: 'init'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
-      backendServiceArm: '$(azureBackendServiceArm)'
+      backendServiceArm: 'Azure-ADO-Pipeline'
       backendAzureRmStorageAccountName: '$(azureBackendAzureRmStorageAccountName)'
       backendAzureRmContainerName: '$(azureBackendAzureRmContainerName)'
       backendAzureRmKey: '$(azureBackendAzureRmKey)'
