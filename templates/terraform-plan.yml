@@ -1,6 +1,8 @@
 parameters:
   - name: terraformWorkingDir
     type: string
+  - name: serviceConnection
+    type: string
 
 steps:
   - task: TerraformTask@5
@@ -9,8 +11,8 @@ steps:
       provider: 'azurerm'
       command: 'plan'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
-      environmentServiceNameAzureRM: '${{ parameters.serviceConnection }}'
       commandOptions: '-out=tfplan'
+      environmentServiceNameAzureRM: '${{ parameters.serviceConnection }}'
 
   - task: PublishPipelineArtifact@1
     displayName: Publish tfplan
