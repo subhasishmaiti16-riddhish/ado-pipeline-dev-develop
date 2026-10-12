@@ -37,11 +37,20 @@ stages:
       persistCredentials: true
 
     - task: PowerShell@2
-      displayName: Configure Git Authentication
+      displayName: Configure Azure DevOps Git Authentication
       inputs:
         targetType: inline
         script: |
-          git config --global http.https://dev.azure.com/subhasishmaiti16.extraheader "AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN"
+          $token = $env:SYSTEM_ACCESSTOKEN
+          if ([string]::IsNullOrEmpty($token)) {
+            throw "System.AccessToken is empty"
+          }
+
+          $encoded = [Convert]::ToBase64String(
+            [Text.Encoding]::ASCII.GetBytes(":$token")
+          )
+
+          git config --global http.https://dev.azure.com/subhasishmaiti16.extraheader "AUTHORIZATION: Basic $encoded"
       env:
         SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
