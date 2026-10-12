@@ -13,11 +13,11 @@ variables:
   - group: ado-pipeline-auto
 
 stages:
-- stage: terraformInitAndValidate
-  displayName: Terraform Init and Validate
+- stage: terraformInitValidateAndPlan
+  displayName: Terraform Init Validate And Plan
   jobs:
   - job: terraformInitAndValidate
-    displayName: Terraform Init And Validate
+    displayName: Terraform Init Validate And Plan
     steps:
 
     - template: templates/terraform-install.yml
@@ -38,6 +38,8 @@ stages:
         terraformWorkingDir: '$(terraformWorkingDir)'
 
 - stage: terraformApply
+  dependsOn: terraformInitValidateAndPlan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
   - job: TerraformApply
     steps:
