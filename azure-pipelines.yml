@@ -23,7 +23,12 @@ stages:
   jobs:
   - job: terraformInitAndValidate
     displayName: Terraform Init Validate And Plan
+    
     steps:
+    - checkout: self
+      clean: true
+      persistCredentials: true
+
     - template: templates/terraform-install.yml
       parameters:
         terraformVersion: '1.9.8'
@@ -32,27 +37,6 @@ stages:
         where terraform
         terraform version
       displayName: Verify Terraform Installation
-
-    - checkout: self
-      persistCredentials: true
-
-    - task: PowerShell@2
-      displayName: Configure Azure DevOps Git Authentication
-      inputs:
-        targetType: inline
-        script: |
-          $token = $env:SYSTEM_ACCESSTOKEN
-          if ([string]::IsNullOrEmpty($token)) {
-            throw "System.AccessToken is empty"
-          }
-
-          $encoded = [Convert]::ToBase64String(
-            [Text.Encoding]::ASCII.GetBytes(":$token")
-          )
-
-          git config --global http.https://dev.azure.com/subhasishmaiti16.extraheader "AUTHORIZATION: Basic $encoded"
-      env:
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
     - template: templates/terraform-init.yml
       parameters:
@@ -71,6 +55,7 @@ stages:
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
         serviceConnection: '$(azureServiceConnection)'
+
 
 - stage: terraformApply
   displayName: Terraform Apply
