@@ -34,6 +34,6 @@ stages:
         terraformWorkingDir: '$(terraformWorkingDir)'
 
     
-    - template: templates/terraform-validate.yml
+    - template: terraform-validate.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
