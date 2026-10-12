@@ -36,3 +36,15 @@ stages:
     - template: templates/terraform-plan.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
+
+- stage: terraformApply
+  jobs:
+  - job: TerraformApply
+    steps:
+    - template: templates/terraform-init.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
+
+    - template: templates/terraform-apply.yml
+      parameters:
+        terraformWorkingDir: '$(terraformWorkingDir)'
