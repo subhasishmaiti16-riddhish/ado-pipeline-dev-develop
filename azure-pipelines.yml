@@ -1,11 +1,11 @@
 pool: DevOps-pipeline
 
 trigger:
-  branches:    ###Branch filter
+  branches:
     include:
     - develop
     - feature/*
-  paths:       ###Path filter
+  paths:
     include:
       - env/dev/*
 
@@ -15,7 +15,7 @@ variables:
   backendResourceGroup: 'rg-devops'
   backendStorageAccount: 'datablockstorage'
   backendContainer: 'aksstoragecont'
-  backendKey: 'env.aksstoragecont'
+  backendKey: 'dev.terraform.tfstate'
 
 stages:
 - stage: terraformInitValidateAndPlan
@@ -24,7 +24,6 @@ stages:
   - job: terraformInitAndValidate
     displayName: Terraform Init Validate And Plan
     steps:
-
     - template: templates/terraform-install.yml
       parameters:
         terraformVersion: '1.9.8'
@@ -37,8 +36,12 @@ stages:
     - template: templates/terraform-init.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
+        serviceConnection: '$(azureServiceConnection)'
+        backendResourceGroup: '$(backendResourceGroup)'
+        backendStorageAccount: '$(backendStorageAccount)'
+        backendContainer: '$(backendContainer)'
+        backendKey: '$(backendKey)'
 
-    
     - template: templates/terraform-validate.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
@@ -46,17 +49,46 @@ stages:
     - template: templates/terraform-plan.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
+        serviceConnection: '$(azureServiceConnection)'
 
 - stage: terraformApply
+  displayName: Terraform Apply
   dependsOn: terraformInitValidateAndPlan
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   jobs:
-  - job: TerraformApply
-    steps:
-    - template: templates/terraform-init.yml
-      parameters:
-        terraformWorkingDir: '$(terraformWorkingDir)'
+  - deployment: TerraformApply
+    displayName: Terraform Apply (Approval Required)
+    environment: 'dev-terraform'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
 
-    - template: templates/terraform-apply.yml
-      parameters:
-        terraformWorkingDir: '$(terraformWorkingDir)'
+          - download: none
+
+          - template: templates/terraform-install.yml
+            parameters:
+              terraformVersion: '1.9.8'
+
+          - template: templates/terraform-init.yml
+            parameters:
+              terraformWorkingDir: '$(terraformWorkingDir)'
+              serviceConnection: '$(azureServiceConnection)'
+              backendResourceGroup: '$(backendResourceGroup)'
+              backendStorageAccount: '$(backendStorageAccount)'
+              backendContainer: '$(backendContainer)'
+              backendKey: '$(backendKey)'
+
+          - task: DownloadPipelineArtifact@2
+            displayName: Download tfplan
+            inputs:
+              artifact: 'tfplan'
+              path: '$(terraformWorkingDir)'
+
+          - template: templates/terraform-apply.yml
+            parameters:
+              terraformWorkingDir: '$(terraformWorkingDir)'
+              serviceConnection: '$(azureServiceConnection)'
+
+
