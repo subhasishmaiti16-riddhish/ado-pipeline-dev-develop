@@ -33,6 +33,10 @@ stages:
         terraform version
       displayName: Verify Terraform Installation
 
+    - script: |
+        git config --global http.https://dev.azure.com/.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
+      displayName: Configure git auth for Terraform modules
+
     - template: templates/terraform-init.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
