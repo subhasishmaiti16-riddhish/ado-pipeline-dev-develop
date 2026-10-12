@@ -3,7 +3,7 @@ pool: DevOps-pipeline
 trigger:
   branches:    ###Branch filter
     include:
-    - main
+    - develop
     - feature/*
   paths:       ###Path filter
     include:
@@ -39,7 +39,7 @@ stages:
 
 - stage: terraformApply
   dependsOn: terraformInitValidateAndPlan
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   jobs:
   - job: TerraformApply
     steps:
