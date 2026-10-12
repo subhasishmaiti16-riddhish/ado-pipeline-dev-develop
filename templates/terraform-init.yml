@@ -15,6 +15,7 @@ parameters:
 steps:
   - powershell: |
       git config --global url."https://pat:$($env:SYSTEM_ACCESSTOKEN)@dev.azure.com/".insteadOf "https://dev.azure.com/"
+      git config --global http.https://dev.azure.com/subhasishmaiti16.extraheader "AUTHORIZATION: bearer $($env:SYSTEM_ACCESSTOKEN)"
     displayName: 'Configure Git Credentials for Terraform Modules'
     env:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)

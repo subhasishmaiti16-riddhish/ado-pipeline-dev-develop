@@ -1,3 +1,18 @@
+resources:
+  repositories:
+    - repository: Vnets
+      type: git
+      name: Resource-Template/Vnets
+      ref: main
+    - repository: Subnets
+      type: git
+      name: Resource-Template/Subnets
+      ref: main
+    - repository: rgs
+      type: git
+      name: Resource-Template/rgs
+      ref: main
+
 pool: DevOps-pipeline
 
 trigger:
