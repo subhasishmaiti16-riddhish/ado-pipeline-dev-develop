@@ -36,9 +36,14 @@ stages:
     - checkout: self
       persistCredentials: true
 
-    - script: |
-        git config --global url."https://oauth2:$(System.AccessToken)@dev.azure.com/".insteadOf "https://dev.azure.com/"
-      displayName: Configure git auth for Terraform modules
+    - task: PowerShell@2
+      displayName: Configure Git Authentication
+      inputs:
+        targetType: inline
+        script: |
+          git config --global http.https://dev.azure.com/subhasishmaiti16.extraheader "AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN"
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
     - template: templates/terraform-init.yml
       parameters:
