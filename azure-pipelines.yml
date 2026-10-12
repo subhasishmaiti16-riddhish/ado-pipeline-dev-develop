@@ -34,7 +34,7 @@ stages:
       displayName: Verify Terraform Installation
 
     - script: |
-        git config --global http.https://dev.azure.com/.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
+        git config --global url."https://oauth2:$(System.AccessToken)@dev.azure.com/".insteadOf "https://dev.azure.com/"
       displayName: Configure git auth for Terraform modules
 
     - template: templates/terraform-init.yml
