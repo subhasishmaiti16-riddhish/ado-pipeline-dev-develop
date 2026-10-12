@@ -1,6 +1,7 @@
 parameters:
   - name: terraformWorkingDir
     type: string
+    default: '$(System.DefaultWorkingDirectory)/env/dev'
 
 steps:
   - task: TerraformTask@5
