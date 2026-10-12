@@ -9,7 +9,7 @@ steps:
       provider: 'azurerm'
       command: 'init'
       workingDirectory: '${{ parameters.terraformWorkingDir }}'
-      backendServiceArm: '$(azureServiceConnection)'
+      backendServiceArm: '$(azureBackendServiceArm)'
       backendAzureRmStorageAccountName: '$(azureBackendAzureRmStorageAccountName)'
       backendAzureRmContainerName: '$(azureBackendAzureRmContainerName)'
       backendAzureRmKey: '$(azureBackendAzureRmKey)'
