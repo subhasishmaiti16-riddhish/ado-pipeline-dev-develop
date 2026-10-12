@@ -13,6 +13,12 @@ parameters:
     type: string
 
 steps:
+  - powershell: |
+      git config --global url."https://pat:$($env:SYSTEM_ACCESSTOKEN)@dev.azure.com/".insteadOf "https://dev.azure.com/"
+    displayName: 'Configure Git Credentials for Terraform Modules'
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
   - task: TerraformTask@5
     displayName: Terraform Init
     inputs:
