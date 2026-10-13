@@ -56,8 +56,8 @@ stages:
       displayName: 'Debug: Verify .tf files exist'
 
     - script: |
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
+        git config --local http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
+        git config --local http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
       displayName: 'Set Git credentials for Terraform modules'
 
     - template: terraform-install.yml@terraform-template
@@ -107,8 +107,8 @@ stages:
           - download: none
 
           - script: |
-              git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-              git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
+              git config --local http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
+              git config --local http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
             displayName: 'Set Git credentials for Terraform modules'
 
           - template: terraform-install.yml@terraform-template
