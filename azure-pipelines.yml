@@ -1,16 +1,16 @@
 resources:
   repositories:
-    - repository: Vnets
+    - repository: reusable-vnets
       type: git
-      name: Resource-Template/Vnets
+      name: reusable-vnets
       ref: main
-    - repository: Subnets
+    - repository: reusable-subnets
       type: git
-      name: Resource-Template/Subnets
+      name: reusable-subnets
       ref: main
-    - repository: rgs
+    - repository: reusable-rgs
       type: git
-      name: Resource-Template/rgs
+      name: reusable-rgs
       ref: main
 
 pool: DevOps-pipeline
@@ -44,7 +44,7 @@ stages:
       clean: true
       persistCredentials: true
 
-    - template: templates/terraform-install.yml
+    - template: terraform-install.yml
       parameters:
         terraformVersion: '1.9.8'
 
@@ -53,7 +53,7 @@ stages:
         terraform version
       displayName: Verify Terraform Installation
 
-    - template: templates/terraform-init.yml
+    - template: terraform-init.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
         serviceConnection: '$(azureServiceConnection)'
@@ -62,11 +62,11 @@ stages:
         backendContainer: '$(backendContainer)'
         backendKey: '$(backendKey)'
 
-    - template: templates/terraform-validate.yml
+    - template: terraform-validate.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
 
-    - template: templates/terraform-plan.yml
+    - template: terraform-plan.yml
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
         serviceConnection: '$(azureServiceConnection)'
@@ -90,11 +90,11 @@ stages:
 
           - download: none
 
-          - template: templates/terraform-install.yml
+          - template: terraform-install.yml
             parameters:
               terraformVersion: '1.9.8'
 
-          - template: templates/terraform-init.yml
+          - template: terraform-init.yml
             parameters:
               terraformWorkingDir: '$(terraformWorkingDir)'
               serviceConnection: '$(azureServiceConnection)'
@@ -109,7 +109,7 @@ stages:
               artifact: 'tfplan'
               path: '$(terraformWorkingDir)'
 
-          - template: templates/terraform-apply.yml
+          - template: terraform-apply.yml
             parameters:
               terraformWorkingDir: '$(terraformWorkingDir)'
               serviceConnection: '$(azureServiceConnection)'

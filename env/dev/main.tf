@@ -1,17 +1,17 @@
 module "rg_dev" {
-  source = "git::https://dev.azure.com/subhasishmaiti16/Resource-Template/_git/rgs//rg?ref=main"
+  source = "https://subhasishmaiti16@dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs"
 
   rg = var.rg_dev
 }
 
 module "vnet_dev" {
-  source = "git::https://dev.azure.com/subhasishmaiti16/Resource-Template/_git/Vnets//vnets?ref=main"
+  source = "https://subhasishmaiti16@dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets"
 
   vnets = var.vnet_dev
 }
 
 module "subnet_dev" {
-  source = "git::https://dev.azure.com/subhasishmaiti16/Resource-Template/_git/Subnets//subnet?ref=main"
+  source = "https://subhasishmaiti16@dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets"
 
   subnet = var.subnet_dev
 }
