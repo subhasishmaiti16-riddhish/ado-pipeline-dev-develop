@@ -30,7 +30,7 @@ trigger:
       - env/dev/*
 
 variables:
-  - group: do-pipeline-auto
+  - group: ado-pipeline-auto
 
   - name: terraformWorkingDir
     value: '$(System.DefaultWorkingDirectory)/ado-rg-cicd/env/dev'
