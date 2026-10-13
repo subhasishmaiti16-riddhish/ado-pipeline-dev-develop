@@ -64,7 +64,6 @@ stages:
     - checkout: reusable-subnets
     - checkout: reusable-rgs
 
-    
     - task: PowerShell@2
       displayName: Configure Git Authentication
       inputs:
@@ -73,20 +72,40 @@ stages:
           $pat = $env:MODULE_PAT
 
           if ([string]::IsNullOrWhiteSpace($pat)) {
-            throw "MODUL_PAT is empty or not linked."
+            throw "MODUL_PAT is empty or not linked to the pipeline."
           }
 
           $encoded = [Convert]::ToBase64String(
-            [Text.Encoding]::ASCII.GetBytes(":$pat")
+            [System.Text.Encoding]::UTF8.GetBytes(":$pat")
           )
 
-          $header = "Basic $encoded"
+          $header = "AUTHORIZATION: Basic $encoded"
 
-          git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "$header"
-          git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "$header"
-          git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs.extraheader "$header"
+          git config --global `
+            "http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader" `
+            "$header"
+
+          git config --global `
+            "http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader" `
+            "$header"
 
           Write-Host "Git authentication configured."
+
+          git ls-remote `
+            "https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets" `
+            refs/heads/main
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Authentication failed for reusable-vnets."
+          }
+
+          git ls-remote `
+            "https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets" `
+            refs/heads/main
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Authentication failed for reusable-subnets."
+          }
       env:
         MODULE_PAT: $(MODUL_PAT)
 
