@@ -30,13 +30,26 @@ trigger:
       - env/dev/*
 
 variables:
-  terraformWorkingDir: '$(System.DefaultWorkingDirectory)/ado-rg-cicd/env/dev'
-  azureServiceConnection: 'Azure-ADO-Pipeline'
-  backendResourceGroup: 'rg-devops'
-  backendStorageAccount: 'datablockstorage'
-  backendContainer: 'aksstoragecont'
-  backendKey: 'dev.terraform.tfstate'
+  - group: do-pipeline-auto
 
+  - name: terraformWorkingDir
+    value: '$(System.DefaultWorkingDirectory)/ado-rg-cicd/env/dev'
+
+  - name: azureServiceConnection
+    value: 'Azure-ADO-Pipeline'
+
+  - name: backendResourceGroup
+    value: 'rg-devops'
+
+  - name: backendStorageAccount
+    value: 'datablockstorage'
+
+  - name: backendContainer
+    value: 'aksstoragecont'
+
+  - name: backendKey
+    value: 'dev.terraform.tfstate'
+  
 stages:
 - stage: terraformInitValidateAndPlan
   displayName: Terraform Init Validate And Plan
@@ -52,30 +65,30 @@ stages:
     - checkout: reusable-rgs
 
     
-    - powershell: |
-        $token = $env:SYSTEM_ACCESSTOKEN
-
-        if ([string]::IsNullOrWhiteSpace($token)) {
-          throw "System.AccessToken is empty."
-        }
-
-        $header = "AUTHORIZATION: bearer $token"
-
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "$header"
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "$header"
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs.extraheader "$header"
-
-        Write-Host "Git authentication configured."
+    - task: PowerShell@2
       displayName: Configure Git Authentication
-      env:
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      inputs:
+        targetType: inline
+        script: |
+          $pat = $env:MODULE_PAT
 
-  
-    - script: |
-        cd "$(terraformWorkingDir)"
-        echo "--- Checking git config ---"
-        git config --local --list | findstr "extraheader"
-      displayName: 'Debug: Verify git config was written'
+          if ([string]::IsNullOrWhiteSpace($pat)) {
+            throw "MODUL_PAT is empty or not linked."
+          }
+
+          $encoded = [Convert]::ToBase64String(
+            [Text.Encoding]::ASCII.GetBytes(":$pat")
+          )
+
+          $header = "Basic $encoded"
+
+          git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "$header"
+          git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "$header"
+          git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs.extraheader "$header"
+
+          Write-Host "Git authentication configured."
+      env:
+        MODULE_PAT: $(MODUL_PAT)
 
     - template: terraform-install.yml@terraform-template
       parameters:
