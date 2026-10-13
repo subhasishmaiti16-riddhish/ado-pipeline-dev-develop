@@ -15,7 +15,7 @@ resources:
     - repository: terraform-template
       type: git
       name: pipeline-auto/resource-template
-      ref: feature/gitflow
+      ref: main
 
 
 pool: DevOps-pipeline
