@@ -52,8 +52,13 @@ stages:
 
     - script: |
         echo "System.DefaultWorkingDirectory = $(System.DefaultWorkingDirectory)"
+        echo "----- Root contents -----"
         dir "$(System.DefaultWorkingDirectory)"
-      displayName: 'Debug: Check actual checkout path'
+        echo "----- Target working dir: $(terraformWorkingDir) -----"
+        dir "$(terraformWorkingDir)"
+        echo "----- .tf files in target dir -----"
+        dir "$(terraformWorkingDir)\*.tf"
+      displayName: 'Debug: Verify working directory and .tf files'
 
     - script: |
         git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
