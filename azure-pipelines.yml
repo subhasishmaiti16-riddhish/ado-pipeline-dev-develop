@@ -2,19 +2,19 @@ resources:
   repositories:
     - repository: reusable-vnets
       type: git
-      name: reusable-vnets
+      name: pipeline-auto/reusable-vnets
       ref: main
     - repository: reusable-subnets
       type: git
-      name: reusable-subnets
+      name: pipeline-auto/reusable-subnets
       ref: main
     - repository: reusable-rgs
       type: git
-      name: reusable-rgs
+      name: pipeline-auto/reusable-rgs
       ref: main
-    - repository: resource-template
+    - repository: terraform-install
       type: git
-      name: terraform-install.yml
+      name: pipeline-auto/resource-template
       ref: refs/heads/main
 
 
@@ -49,7 +49,7 @@ stages:
       clean: true
       persistCredentials: true
 
-    - template: terraform-install.yml@resource-template
+    - template: terraform-install.yml@terraform-install
       parameters:
         terraformVersion: '1.9.8'
 
