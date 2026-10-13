@@ -52,16 +52,10 @@ stages:
     - checkout: reusable-rgs
 
     - script: |
-        # Purono stale config clean korun
-        git config --global --remove-section http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets 2>NUL || exit 0
-        git config --global --remove-section http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets 2>NUL || exit 0
-        git config --global --remove-section http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs 2>NUL || exit 0
-        
-        # Notun token set korun
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-        git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-      displayName: 'Clean and Set Global Git credentials for Terraform modules'
+        git config --global url."https://$(System.AccessToken)@dev.azure.com".insteadOf "https://dev.azure.com"
+      displayName: 'Set git credentials with insteadOf'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   
     - script: |
         cd "$(terraformWorkingDir)"
@@ -112,20 +106,14 @@ stages:
           - checkout: self
             clean: true
             persistCredentials: true
+          - checkout: reusable-vnets
+            persistCredentials: true
+          - checkout: reusable-subnets
+            persistCredentials: true
+          - checkout: reusable-rgs
+            persistCredentials: true
 
           - download: none
-
-          - script: |
-              # Purono stale config clean korun
-              git config --global --remove-section http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets 2>NUL || exit 0
-              git config --global --remove-section http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets 2>NUL || exit 0
-              git config --global --remove-section http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs 2>NUL || exit 0
-              
-              # Notun token set korun
-              git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-vnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-              git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-subnets.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-              git config --global http.https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/reusable-rgs.extraheader "AUTHORIZATION: bearer $(System.AccessToken)"
-            displayName: 'Clean and Set Global Git credentials for Terraform modules'
 
           - template: terraform-install.yml@terraform-template
             parameters:
