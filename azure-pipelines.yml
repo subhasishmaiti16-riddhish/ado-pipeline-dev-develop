@@ -12,7 +12,7 @@ resources:
       type: git
       name: pipeline-auto/reusable-rgs
       ref: main
-    - repository: terraform-install
+    - repository: terraform-template
       type: git
       name: pipeline-auto/resource-template
       ref: feature/gitflow
@@ -49,7 +49,7 @@ stages:
       clean: true
       persistCredentials: true
 
-    - template: terraform-install.yml@terraform-install
+    - template: terraform-install.yml@terraform-template
       parameters:
         terraformVersion: '1.9.8'
 
@@ -67,11 +67,11 @@ stages:
         backendContainer: '$(backendContainer)'
         backendKey: '$(backendKey)'
 
-    - template: terraform-validate.yml
+    - template: terraform-validate.yml@terraform-template
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
 
-    - template: terraform-plan.yml
+    - template: terraform-plan.yml@terraform-template
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
         serviceConnection: '$(azureServiceConnection)'
@@ -95,11 +95,11 @@ stages:
 
           - download: none
 
-          - template: terraform-install.yml
+          - template: terraform-install.yml@terraform-template
             parameters:
               terraformVersion: '1.9.8'
 
-          - template: terraform-init.yml
+          - template: terraform-init.yml@terraform-template
             parameters:
               terraformWorkingDir: '$(terraformWorkingDir)'
               serviceConnection: '$(azureServiceConnection)'
@@ -114,7 +114,7 @@ stages:
               artifact: 'tfplan'
               path: '$(terraformWorkingDir)'
 
-          - template: terraform-apply.yml
+          - template: terraform-apply.yml@terraform-template
             parameters:
               terraformWorkingDir: '$(terraformWorkingDir)'
               serviceConnection: '$(azureServiceConnection)'
