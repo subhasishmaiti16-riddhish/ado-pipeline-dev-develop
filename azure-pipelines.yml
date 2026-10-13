@@ -53,7 +53,7 @@ stages:
 
     - script: |
         git config --global url."https://$(System.AccessToken)@dev.azure.com".insteadOf "https://dev.azure.com"
-      displayName: 'Set git credentials with insteadOf'
+      displayName: 'Set Git credentials for Terraform modules'
       env:
         SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   
