@@ -58,7 +58,7 @@ stages:
         terraform version
       displayName: Verify Terraform Installation
 
-    - template: terraform-init.yml
+    - template: terraform-init.yml@terraform-template
       parameters:
         terraformWorkingDir: '$(terraformWorkingDir)'
         serviceConnection: '$(azureServiceConnection)'
