@@ -1,20 +1,68 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# # 🚀 Azure Infrastructure Automation | Terraform + Azure DevOps + Reusable Templates
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+### ☁️ Infrastructure as Code • CI/CD • Automated Deployment
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## 🎯 Project Overview
+Designed and implemented a modular Azure infrastructure automation solution using Terraform reusable modules and Azure DevOps multi-stage YAML pipelines.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## 🛠️ Technologies Used
+- ☁️ Microsoft Azure
+- 🚀 Terraform
+- 🔄 Azure DevOps CI/CD
+- 📦 Azure Repos & Git
+- ⚙️ PowerShell
+- 💾 Azure Storage Remote State
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## 🧱 Reusable Terraform Modules
+- 📁 `reusable-rgs` — Resource Group provisioning
+- 🌐 `reusable-vnets` — Virtual Network provisioning
+- 🔗 `reusable-subnets` — Subnet provisioning
+- 🧩 `terraform.tfvars` & `variables.tf` — Parameterized infrastructure configuration
+
+## ⚙️ Reusable YAML Templates
+- `terraform-install.yml`
+- `terraform-init.yml`
+- `terraform-validate.yml`
+- `terraform-plan.yml`
+- `terraform-apply.yml`
+
+## 🔄 CI/CD Pipeline Workflow
+
+**🚀 Stage 1: Terraform Init, Validate & Plan**
+- Automatic triggers for `develop` and `feature/*` branches, filtered by changes under `env/dev/`
+- Checkout root and reusable module repositories
+- 🔐 Secure Git authentication for private Terraform modules
+- ⚙️ Terraform installation and initialization
+- ✅ Configuration validation
+- 📋 Terraform execution plan generation
+
+**🛡️ Stage 2: Approval-Gated Terraform Apply**
+- Runs only on `develop` after Stage 1 succeeds
+- ✋ Manual approval through the `dev-terraform` Azure DevOps Environment
+- 📦 Downloads the `tfplan` pipeline artifact
+- 🚀 Applies the reviewed infrastructure plan to Azure
+
+## 💾 Remote State Management
+Configured Azure Storage backend for centralized Terraform state management.
+
+- Resource Group: `rg-devops`
+- Storage Account: `datablockstorage`
+- Container: `aksstoragecont`
+- State Key: `preprod.aksstoragecont`
+
+## 💡 Key DevOps Practices
+- ♻️ Modular and reusable Infrastructure as Code
+- 🔀 Git-based version control
+- 🎯 Branch and path-based pipeline triggers
+- 🧩 Reusable YAML templates
+- 🔐 Secure authentication for private repositories
+- 📋 Terraform plan artifact workflow
+- ✋ Approval-controlled deployments
+- 💾 Remote state management
+
+## 🏆 Project Outcome
+Built a repeatable Azure infrastructure deployment workflow combining reusable Terraform modules, automated validation and planning, and approval-gated deployments.
+
+🚀 **Automate Infrastructure. Validate Changes. Deploy with Confidence.**
+
+#Azure #Terraform #AzureDevOps #DevOps #CICD #InfrastructureAsCode #CloudAutomation
