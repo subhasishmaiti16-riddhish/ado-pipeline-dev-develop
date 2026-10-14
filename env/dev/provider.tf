@@ -4,7 +4,7 @@ terraform {
     resource_group_name  = "rg-devops"
     storage_account_name = "datablockstorage"
     container_name       = "aksstoragecont"
-    key                  = "env.aksstoragecont"
+    key                  = "dev.terraform.tfstate"
 
   }
   required_providers {
