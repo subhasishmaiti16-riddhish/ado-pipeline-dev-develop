@@ -1,0 +1,290 @@
+resources:
+  repositories:
+    - repository: reusable-vnets
+      type: git
+      name: pipeline-auto/reusable-vnets
+      ref: main
+
+    - repository: reusable-subnets
+      type: git
+      name: pipeline-auto/reusable-subnets
+      ref: main
+
+    - repository: reusable-rgs
+      type: git
+      name: pipeline-auto/reusable-rgs
+      ref: main
+
+    - repository: terraform-template
+      type: git
+      name: pipeline-auto/resource-template
+      ref: main
+
+
+pool: DevOps-pipeline
+
+trigger:
+  branches:
+    include:
+      - develop
+      - feature/*
+  paths:
+    include:
+      - env/dev/*
+
+
+variables:
+  - group: ado-pipeline-auto
+
+  - name: terraformWorkingDir
+    value: '$(System.DefaultWorkingDirectory)/ado-rg-cicd/env/dev'
+
+  - name: azureServiceConnection
+    value: 'Azure-ADO-Pipeline'
+
+  - name: backendResourceGroup
+    value: 'rg-devops'
+
+  - name: backendStorageAccount
+    value: 'datablockstorage'
+
+  - name: backendContainer
+    value: 'aksstoragecont'
+
+  - name: backendKey
+    value: 'preprod.aksstoragecont'
+
+
+stages:
+
+# ==========================================
+# STAGE 1: TERRAFORM INIT, VALIDATE AND PLAN
+# ==========================================
+
+- stage: terraformInitValidateAndPlan
+  displayName: Terraform Init Validate And Plan
+
+  jobs:
+    - job: terraformInitAndValidate
+      displayName: Terraform Init Validate And Plan
+
+      steps:
+        - checkout: self
+          persistCredentials: true
+
+        - checkout: reusable-vnets
+
+        - checkout: reusable-subnets
+
+        - checkout: reusable-rgs
+
+
+        # Configure Git authentication for private Terraform modules
+        - task: PowerShell@2
+          displayName: Configure Git Authentication
+          inputs:
+            targetType: inline
+            script: |
+              $pat = $env:MODULE_PAT
+
+              if ([string]::IsNullOrWhiteSpace($pat)) {
+                throw "MODUL_PAT is empty or not linked to the pipeline."
+              }
+
+              $encoded = [Convert]::ToBase64String(
+                [System.Text.Encoding]::UTF8.GetBytes(":$pat")
+              )
+
+              $header = "AUTHORIZATION: Basic $encoded"
+
+              $repositories = @(
+                "reusable-vnets",
+                "reusable-subnets",
+                "reusable-rgs"
+              )
+
+              foreach ($repo in $repositories) {
+                $repoUrl = "https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/$repo"
+
+                git config --global `
+                  "http.$repoUrl.extraheader" `
+                  "$header"
+
+                if ($LASTEXITCODE -ne 0) {
+                  throw "Failed to configure Git authentication for $repo."
+                }
+
+                Write-Host "Testing Git access for $repo..."
+
+                git ls-remote $repoUrl refs/heads/main
+
+                if ($LASTEXITCODE -ne 0) {
+                  throw "Authentication failed for $repo."
+                }
+
+                Write-Host "Git access verified for $repo."
+              }
+
+              Write-Host "Git authentication configured successfully."
+          env:
+            MODULE_PAT: $(MODUL_PAT)
+
+
+        # Install Terraform
+        - template: terraform-install.yml@terraform-template
+          parameters:
+            terraformVersion: '1.11.1'
+
+
+        # Verify Terraform installation
+        - script: |
+            where terraform
+            terraform version
+          displayName: Verify Terraform Installation
+
+
+        # Terraform Init
+        - template: terraform-init.yml@terraform-template
+          parameters:
+            terraformWorkingDir: '$(terraformWorkingDir)'
+            serviceConnection: '$(azureServiceConnection)'
+            backendResourceGroup: '$(backendResourceGroup)'
+            backendStorageAccount: '$(backendStorageAccount)'
+            backendContainer: '$(backendContainer)'
+            backendKey: '$(backendKey)'
+
+
+        # Terraform Validate
+        - template: terraform-validate.yml@terraform-template
+          parameters:
+            terraformWorkingDir: '$(terraformWorkingDir)'
+
+
+        # Terraform Plan
+        - template: terraform-plan.yml@terraform-template
+          parameters:
+            terraformWorkingDir: '$(terraformWorkingDir)'
+            serviceConnection: '$(azureServiceConnection)'
+
+
+# ==========================================
+# STAGE 2: TERRAFORM APPLY
+# Runs only on develop after Stage 1 succeeds
+# Azure DevOps environment approval applies
+# ==========================================
+
+- stage: terraformApply
+  displayName: Terraform Apply
+
+  dependsOn: terraformInitValidateAndPlan
+
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+
+  jobs:
+    - deployment: TerraformApply
+      displayName: Terraform Apply (Approval Required)
+
+      environment: 'dev-terraform'
+
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+                clean: true
+                persistCredentials: true
+
+              - checkout: reusable-vnets
+                persistCredentials: true
+
+              - checkout: reusable-subnets
+                persistCredentials: true
+
+              - checkout: reusable-rgs
+                persistCredentials: true
+
+
+              - download: none
+
+
+              # Configure Git authentication for private Terraform modules
+              - task: PowerShell@2
+                displayName: Configure Git Authentication
+                inputs:
+                  targetType: inline
+                  script: |
+                    $pat = $env:MODULE_PAT
+
+                    if ([string]::IsNullOrWhiteSpace($pat)) {
+                      throw "MODUL_PAT is empty or not linked to the pipeline."
+                    }
+
+                    $encoded = [Convert]::ToBase64String(
+                      [System.Text.Encoding]::UTF8.GetBytes(":$pat")
+                    )
+
+                    $header = "AUTHORIZATION: Basic $encoded"
+
+                    $repositories = @(
+                      "reusable-vnets",
+                      "reusable-subnets",
+                      "reusable-rgs"
+                    )
+
+                    foreach ($repo in $repositories) {
+                      $repoUrl = "https://dev.azure.com/subhasishmaiti16/pipeline-auto/_git/$repo"
+
+                      git config --global `
+                        "http.$repoUrl.extraheader" `
+                        "$header"
+
+                      if ($LASTEXITCODE -ne 0) {
+                        throw "Failed to configure Git authentication for $repo."
+                      }
+
+                      Write-Host "Testing Git access for $repo..."
+
+                      git ls-remote $repoUrl refs/heads/main
+
+                      if ($LASTEXITCODE -ne 0) {
+                        throw "Authentication failed for $repo."
+                      }
+
+                      Write-Host "Git access verified for $repo."
+                    }
+
+                    Write-Host "Git authentication configured successfully."
+                env:
+                  MODULE_PAT: $(MODUL_PAT)
+
+
+              # Install Terraform
+              - template: terraform-install.yml@terraform-template
+                parameters:
+                  terraformVersion: '1.11.1'
+
+
+              # Terraform Init
+              - template: terraform-init.yml@terraform-template
+                parameters:
+                  terraformWorkingDir: '$(terraformWorkingDir)'
+                  serviceConnection: '$(azureServiceConnection)'
+                  backendResourceGroup: '$(backendResourceGroup)'
+                  backendStorageAccount: '$(backendStorageAccount)'
+                  backendContainer: '$(backendContainer)'
+                  backendKey: '$(backendKey)'
+
+
+              # Download Terraform Plan Artifact
+              - task: DownloadPipelineArtifact@2
+                displayName: Download tfplan
+                inputs:
+                  artifact: 'tfplan'
+                  path: '$(terraformWorkingDir)'
+
+
+              # Terraform Apply
+              - template: terraform-apply.yml@terraform-template
+                parameters:
+                  terraformWorkingDir: '$(terraformWorkingDir)'
+                  serviceConnection: '$(azureServiceConnection)'
