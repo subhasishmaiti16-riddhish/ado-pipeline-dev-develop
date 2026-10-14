@@ -133,7 +133,7 @@ stages:
         # Install Terraform
         - template: terraform-install.yml@terraform-template
           parameters:
-            terraformVersion: '1.9.8'
+            terraformVersion: '1.11.1'
 
 
         # Verify Terraform installation
