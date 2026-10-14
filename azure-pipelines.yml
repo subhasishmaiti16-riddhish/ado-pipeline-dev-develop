@@ -52,7 +52,7 @@ variables:
     value: 'aksstoragecont'
 
   - name: backendKey
-    value: 'dev.terraform.tfstate'
+    value: 'preprod.aksstoragecont'
 
 
 stages:
