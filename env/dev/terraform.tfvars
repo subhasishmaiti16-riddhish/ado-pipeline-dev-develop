@@ -23,6 +23,6 @@ subnet_dev = {
     subnet_name      = "subnet-dev-ado-2"
     vnets_name        = "vnet-dev-ado"
     rg_name          = "rg-dev-ado"
-    address_prefixes = ["10.0.1.0/24"]
+    address_prefixes = ["10.0.2.0/24"]
   }
 }
